@@ -1,5 +1,6 @@
 # WebSocketsRPC
 RPC calls based on Websockets
+Current status: DEMO
 
 This project based on project of [websocket-sharp](https://github.com/sta/websocket-sharp) <br>
 I copied the websocket-sharp folder from [websocket-sharp](https://github.com/sta/websocket-sharp) to Web Socket RPC folder in this project
