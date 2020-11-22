@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>WS test</title>
+        <script type="text/javascript">
+            function addMessage(text, isBold = false) {
+                let elem = document.getElementById('messages');
+                if (elem)
+                {
+                    let div = document.createElement('div');
+                    div.innerHTML = isBold ? "<b>" + text + "</b>" : text;
+                    elem.append(div);
+                }
+            }
+        </script>
+	</head>
+	<body>
+        <div id="messages"></div>
+		<script type="text/javascript">
+            'use strict';
+            class WebSocketClient
+            {
+                _url = "";
+                _methods = new Map();
+                _ws;
+
+                _invokeMethods(m_name, m_args = null) {
+                    let need_methods = this._methods.get(m_name);
+                    if (need_methods)
+                        need_methods.forEach((m) => m.apply(this, m_args));
+                }
+
+                onOpen() { // вызывается при открытии соединения
+                    this._invokeMethods('onOpen');
+                    //let query = { Target: "TER", Arguments: ["5", JSON.stringify({ a1: "aaa", a2: 5 }), 78.78] };
+                    //ws.send(JSON.stringify(query));
+                };
+
+                onError(e) { // вызывается в случае ошибки, например, при обрыве связи
+                    this._invokeMethods('onError', [e]);
+                };
+
+                onClose(e) {  // вызывается при закрытии соединения
+                    this._invokeMethods('onClose', [e]);
+                };
+
+                onMessage(msg) { // вызывается, когда сервер посылает сообщение клиенту.
+                    this._invokeMethods('onMessage', [ msg ]);
+                    let json = JSON.parse(msg.data);
+                    if (json.Target && json.Arguments && Array.isArray(json.Arguments)) {
+                        this._invokeMethods(json.Target, json.Arguments);
+                    }
+                };
+
+                send(method)
+                {
+                    let args = [];
+                    if (arguments.length > 0)
+                        for (let i = 1; i < arguments.length; i++)
+                            args.push(arguments[i]);
+                    let message = { Target: method, Arguments: args };
+                    this._ws.send(JSON.stringify(message));
+                }
+
+                on(name, func) {
+                    if (!this._methods.has(name)) {
+                        this._methods.set(name, [func]);
+                    }
+                    else {
+                        let f_arr = this._methods.get(name);
+                        if (f_arr)
+                            f_arr.push(func);
+                    }
+                };
+
+                off(name) {
+                    if (this._methods.has(name)) {
+                        this._methods.delete(name);
+                    }
+                };
+
+                constructor(url) {
+                    this._url = url;
+                };
+
+                connect() {
+                    this._ws = new WebSocket(this._url);
+                    this._ws.onopen = this.onOpen.bind(this);
+                    this._ws.onerror = this.onError.bind(this);
+                    this._ws.onclose = this.onClose.bind(this);
+                    this._ws.onmessage = this.onMessage.bind(this);
+                };
+
+                disconnect() {
+                    this._ws.close();
+                    this._ws = null;
+                };
+            };
+
+            let wsClient = new WebSocketClient('ws://127.0.0.1:9000/Hub');
+            wsClient.on('onMessage', function (msg) {
+                addMessage('New message: ' + msg.data);
+            });
+            wsClient.on('Test', function (testCommand) {
+                wsClient.send("Test", testCommand);
+            });
+            wsClient.on('onOpen', function () {
+                addMessage('Соединение открыто', true);
+            });
+            wsClient.on('onError', function (e) {
+                console.error("ws.onerror", e);
+                addMessage('Ошибка в соединении', true);
+            });
+            wsClient.on('onClose', function (e) {
+                addMessage('Соединение закрыто', true);
+            });
+
+            wsClient.connect();
+			//addMessage(navigator.userAgent); //узнаем что у нас за браузер
+			
+		</script>
+	</body>
+</html>

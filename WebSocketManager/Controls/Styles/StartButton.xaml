@@ -1,0 +1,20 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+                    xmlns:controls="clr-namespace:WebSocketManager.Components">
+    <ControlTemplate TargetType="Button" x:Key="StartButton">
+        <Border CornerRadius="0" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+            <Viewbox Margin="2">
+                <!--Использовал для увеличения масштаба-->
+                <Polygon x:Name="icon" Fill="Green" Points="0, 0, 0, 18, 18, 9"/>
+            </Viewbox>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="Control.IsMouseOver" Value="True">
+                <Setter TargetName="icon" Property="Polygon.Fill" Value="Lime"/>
+            </Trigger>
+            <Trigger Property="UIElement.IsEnabled" Value="False">
+                <Setter TargetName="icon" Property="Polygon.Fill" Value="Gray"/>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+</ResourceDictionary>
