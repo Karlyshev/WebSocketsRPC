@@ -28,13 +28,13 @@
 
 using System;
 
-namespace WebSocketsRPC.Server
+namespace WebSocketSharp.Server
 {
-    internal enum ServerState
-    {
-        Ready,
-        Start,
-        ShuttingDown,
-        Stop
-    }
+  internal enum ServerState
+  {
+    Ready,
+    Start,
+    ShuttingDown,
+    Stop
+  }
 }

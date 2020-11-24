@@ -1,11 +1,4 @@
-﻿using WebSocketsRPC;
-using WebSocketsRPC.Server;
-//using WebSocketManager.Ext;
-using System.Net.NetworkInformation;
-using System.Linq;
-using System.Collections.ObjectModel;
-
-namespace WebSocketsRPC
+﻿namespace WebSocketsRPC
 {
     public class WebSocketRPCService<T> where T: WebSocketRPCProxy, new()
     {

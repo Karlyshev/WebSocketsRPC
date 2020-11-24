@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Linq;
-using WebSocketsRPC.Server;
+using WebSocketSharp.Server;
 
 namespace WebSocketsRPC
 {

@@ -26,60 +26,43 @@
  */
 #endregion
 
-namespace WebSocketsRPC
+using System;
+
+namespace WebSocketSharp
 {
-    #region Description
+  /// <summary>
+  /// Indicates the WebSocket frame type.
+  /// </summary>
+  /// <remarks>
+  /// The values of this enumeration are defined in
+  /// <see href="http://tools.ietf.org/html/rfc6455#section-5.2">
+  /// Section 5.2</see> of RFC 6455.
+  /// </remarks>
+  internal enum Opcode : byte
+  {
     /// <summary>
-    /// Indicates the WebSocket frame type.
+    /// Equivalent to numeric value 0. Indicates continuation frame.
     /// </summary>
-    /// <remarks>
-    /// The values of this enumeration are defined in
-    /// <see href="http://tools.ietf.org/html/rfc6455#section-5.2">
-    /// Section 5.2</see> of RFC 6455.
-    /// </remarks>
-    #endregion Description
-    internal enum Opcode : byte
-    {
-        #region Description
-        /// <summary>
-        /// Equivalent to numeric value 0. Indicates continuation frame.
-        /// </summary>
-        #endregion Description
-        Cont = 0x0,
-
-        #region Description
-        /// <summary>
-        /// Equivalent to numeric value 1. Indicates text frame.
-        /// </summary>
-        #endregion Description
-        Text = 0x1,
-
-        #region Description
-        /// <summary>
-        /// Equivalent to numeric value 2. Indicates binary frame.
-        /// </summary>
-        #endregion Description
-        Binary = 0x2,
-
-        #region Description
-        /// <summary>
-        /// Equivalent to numeric value 8. Indicates connection close frame.
-        /// </summary>
-        #endregion Description
-        Close = 0x8,
-
-        #region Description
-        /// <summary>
-        /// Equivalent to numeric value 9. Indicates ping frame.
-        /// </summary>
-        #endregion Description
-        Ping = 0x9,
-
-        #region Description
-        /// <summary>
-        /// Equivalent to numeric value 10. Indicates pong frame.
-        /// </summary>
-        #endregion Description
-        Pong = 0xa
-    }
+    Cont = 0x0,
+    /// <summary>
+    /// Equivalent to numeric value 1. Indicates text frame.
+    /// </summary>
+    Text = 0x1,
+    /// <summary>
+    /// Equivalent to numeric value 2. Indicates binary frame.
+    /// </summary>
+    Binary = 0x2,
+    /// <summary>
+    /// Equivalent to numeric value 8. Indicates connection close frame.
+    /// </summary>
+    Close = 0x8,
+    /// <summary>
+    /// Equivalent to numeric value 9. Indicates ping frame.
+    /// </summary>
+    Ping = 0x9,
+    /// <summary>
+    /// Equivalent to numeric value 10. Indicates pong frame.
+    /// </summary>
+    Pong = 0xa
+  }
 }

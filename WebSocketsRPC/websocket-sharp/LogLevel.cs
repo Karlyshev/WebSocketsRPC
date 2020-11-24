@@ -26,55 +26,38 @@
  */
 #endregion
 
-namespace WebSocketsRPC
+using System;
+
+namespace WebSocketSharp
 {
-    #region Description
+  /// <summary>
+  /// Specifies the logging level.
+  /// </summary>
+  public enum LogLevel
+  {
     /// <summary>
-    /// Specifies the logging level.
+    /// Specifies the bottom logging level.
     /// </summary>
-    #endregion Description
-    public enum LogLevel
-    {
-        #region Description
-        /// <summary>
-        /// Specifies the bottom logging level.
-        /// </summary>
-        #endregion Description
-        Trace,
-
-        #region Description
-        /// <summary>
-        /// Specifies the 2nd logging level from the bottom.
-        /// </summary>
-        #endregion Description
-        Debug,
-
-        #region Description
-        /// <summary>
-        /// Specifies the 3rd logging level from the bottom.
-        /// </summary>
-        #endregion Description
-        Info,
-
-        #region Description
-        /// <summary>
-        /// Specifies the 3rd logging level from the top.
-        /// </summary>
-        #endregion Description
-        Warn,
-
-        #region Description
-        /// <summary>
-        /// Specifies the 2nd logging level from the top.
-        /// </summary>
-        #endregion Description
-        Error,
-
-        #region Description
-        /// <summary>
-        /// Specifies the top logging level.
-        /// </summary>
-        #endregion Description
-        Fatal
-    }
+    Trace,
+    /// <summary>
+    /// Specifies the 2nd logging level from the bottom.
+    /// </summary>
+    Debug,
+    /// <summary>
+    /// Specifies the 3rd logging level from the bottom.
+    /// </summary>
+    Info,
+    /// <summary>
+    /// Specifies the 3rd logging level from the top.
+    /// </summary>
+    Warn,
+    /// <summary>
+    /// Specifies the 2nd logging level from the top.
+    /// </summary>
+    Error,
+    /// <summary>
+    /// Specifies the top logging level.
+    /// </summary>
+    Fatal
+  }
 }

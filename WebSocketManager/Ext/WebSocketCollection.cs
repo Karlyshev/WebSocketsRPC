@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Windows.Threading;
 using WebSocketManager.Models;
-using WebSocketsRPC.Server;
+using WebSocketSharp.Server;
 
 namespace WebSocketManager.Ext 
 {
@@ -33,13 +33,6 @@ namespace WebSocketManager.Ext
             Lock();
             dispatcher.Invoke(() => _collection.Remove(session));
             Unlock();
-        }
-
-        public IWebSocketSession GetSession(string id) 
-        {
-            //Sessions.TryGetSession(id, out IWebSocketSession session);
-            //return session;
-            return null;
         }
     }
 }

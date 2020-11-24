@@ -26,26 +26,22 @@
  */
 #endregion
 
-namespace WebSocketsRPC
+using System;
+
+namespace WebSocketSharp
 {
-    #region Description
+  /// <summary>
+  /// Specifies the byte order.
+  /// </summary>
+  public enum ByteOrder
+  {
     /// <summary>
-    /// Specifies the byte order.
+    /// Specifies Little-endian.
     /// </summary>
-    #endregion Description
-    public enum ByteOrder
-    {
-        #region Description
-        /// <summary>
-        /// Specifies Little-endian.
-        /// </summary>
-        #endregion Description
-        Little,
-        #region Description
-        /// <summary>
-        /// Specifies Big-endian.
-        /// </summary>
-        #endregion Description
-        Big
-    }
+    Little,
+    /// <summary>
+    /// Specifies Big-endian.
+    /// </summary>
+    Big
+  }
 }

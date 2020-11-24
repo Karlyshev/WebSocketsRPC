@@ -4,7 +4,7 @@
  *
  * The MIT License
  *
- * Copyright (c) 2013-2014 sta.blockhead
+ * Copyright (c) 2013-2020 sta.blockhead
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,53 +28,101 @@
 
 using System;
 
-namespace WebSocketsRPC.Net
+namespace WebSocketSharp.Net
 {
-    internal class HttpHeaderInfo
+  internal class HttpHeaderInfo
+  {
+    #region Private Fields
+
+    private string         _headerName;
+    private HttpHeaderType _headerType;
+
+    #endregion
+
+    #region Internal Constructors
+
+    internal HttpHeaderInfo (string headerName, HttpHeaderType headerType)
     {
-        #region Private Fields
-
-        private string _name;
-        private HttpHeaderType _type;
-
-        #endregion
-
-        #region Internal Constructors
-
-        internal HttpHeaderInfo(string name, HttpHeaderType type)
-        {
-            _name = name;
-            _type = type;
-        }
-
-        #endregion
-
-        #region Internal Properties
-
-        internal bool IsMultiValueInRequest => (_type & HttpHeaderType.MultiValueInRequest) == HttpHeaderType.MultiValueInRequest;
-
-        internal bool IsMultiValueInResponse => (_type & HttpHeaderType.MultiValueInResponse) == HttpHeaderType.MultiValueInResponse;
-
-        #endregion
-
-        #region Public Properties
-
-        public bool IsRequest => (_type & HttpHeaderType.Request) == HttpHeaderType.Request;
-
-        public bool IsResponse => (_type & HttpHeaderType.Response) == HttpHeaderType.Response;
-
-        public string Name => _name;
-
-        public HttpHeaderType Type => _type;
-
-        #endregion
-
-        #region Public Methods
-
-        public bool IsMultiValue(bool response) => (_type & HttpHeaderType.MultiValue) == HttpHeaderType.MultiValue ? (response ? IsResponse : IsRequest) : (response ? IsMultiValueInResponse : IsMultiValueInRequest);
-
-        public bool IsRestricted(bool response) => (_type & HttpHeaderType.Restricted) == HttpHeaderType.Restricted ? (response ? IsResponse : IsRequest) : false;
-
-        #endregion
+      _headerName = headerName;
+      _headerType = headerType;
     }
+
+    #endregion
+
+    #region Internal Properties
+
+    internal bool IsMultiValueInRequest {
+      get {
+        var headerType = _headerType & HttpHeaderType.MultiValueInRequest;
+
+        return headerType == HttpHeaderType.MultiValueInRequest;
+      }
+    }
+
+    internal bool IsMultiValueInResponse {
+      get {
+        var headerType = _headerType & HttpHeaderType.MultiValueInResponse;
+
+        return headerType == HttpHeaderType.MultiValueInResponse;
+      }
+    }
+
+    #endregion
+
+    #region Public Properties
+
+    public string HeaderName {
+      get {
+        return _headerName;
+      }
+    }
+
+    public HttpHeaderType HeaderType {
+      get {
+        return _headerType;
+      }
+    }
+
+    public bool IsRequest {
+      get {
+        var headerType = _headerType & HttpHeaderType.Request;
+
+        return headerType == HttpHeaderType.Request;
+      }
+    }
+
+    public bool IsResponse {
+      get {
+        var headerType = _headerType & HttpHeaderType.Response;
+
+        return headerType == HttpHeaderType.Response;
+      }
+    }
+
+    #endregion
+
+    #region Public Methods
+
+    public bool IsMultiValue (bool response)
+    {
+      var headerType = _headerType & HttpHeaderType.MultiValue;
+
+      if (headerType != HttpHeaderType.MultiValue)
+        return response ? IsMultiValueInResponse : IsMultiValueInRequest;
+
+      return response ? IsResponse : IsRequest;
+    }
+
+    public bool IsRestricted (bool response)
+    {
+      var headerType = _headerType & HttpHeaderType.Restricted;
+
+      if (headerType != HttpHeaderType.Restricted)
+        return false;
+
+      return response ? IsResponse : IsRequest;
+    }
+
+    #endregion
+  }
 }

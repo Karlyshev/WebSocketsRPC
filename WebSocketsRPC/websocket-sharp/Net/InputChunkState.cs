@@ -39,14 +39,14 @@
 
 using System;
 
-namespace WebSocketsRPC.Net
+namespace WebSocketSharp.Net
 {
-    internal enum InputChunkState
-    {
-        None,
-        Data,
-        DataEnded,
-        Trailer,
-        End
-    }
+  internal enum InputChunkState
+  {
+    None,
+    Data,
+    DataEnded,
+    Trailer,
+    End
+  }
 }

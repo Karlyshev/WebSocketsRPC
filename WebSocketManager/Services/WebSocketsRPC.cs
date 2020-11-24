@@ -1,6 +1,6 @@
-﻿using System.Windows.Data;
-using WebSocketManager.Ext;
+﻿using WebSocketManager.Ext;
 using WebSocketManager.Models;
+using WebSocketSharp;
 using WebSocketsRPC;
 
 namespace WebSocketManager.Services

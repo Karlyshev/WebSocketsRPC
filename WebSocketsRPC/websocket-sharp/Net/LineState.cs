@@ -39,12 +39,12 @@
 
 using System;
 
-namespace WebSocketsRPC.Net
+namespace WebSocketSharp.Net
 {
-    internal enum LineState
-    {
-        None,
-        Cr,
-        Lf
-    }
+  internal enum LineState
+  {
+    None,
+    Cr,
+    Lf
+  }
 }

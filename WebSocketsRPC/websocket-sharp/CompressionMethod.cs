@@ -28,32 +28,25 @@
 
 using System;
 
-namespace WebSocketsRPC
+namespace WebSocketSharp
 {
-    #region Description
+  /// <summary>
+  /// Specifies the method for compression.
+  /// </summary>
+  /// <remarks>
+  /// The methods are defined in
+  /// <see href="https://tools.ietf.org/html/rfc7692">
+  /// Compression Extensions for WebSocket</see>.
+  /// </remarks>
+  public enum CompressionMethod : byte
+  {
     /// <summary>
-    /// Specifies the method for compression.
+    /// Specifies no compression.
     /// </summary>
-    /// <remarks>
-    /// The methods are defined in
-    /// <see href="https://tools.ietf.org/html/rfc7692">
-    /// Compression Extensions for WebSocket</see>.
-    /// </remarks>
-    #endregion Description
-    public enum CompressionMethod : byte
-    {
-        #region Description
-        /// <summary>
-        /// Specifies no compression.
-        /// </summary>
-        #endregion Description
-        None,
-
-        #region Description
-        /// <summary>
-        /// Specifies DEFLATE.
-        /// </summary>
-        #endregion Description
-        Deflate
-    }
+    None,
+    /// <summary>
+    /// Specifies DEFLATE.
+    /// </summary>
+    Deflate
+  }
 }
