@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using WebSocketManager.Ext;
 using WebSocketManager.Services;
 using WebSocketManager.ViewModels;
+using WebSocketsRPC;
 
 namespace WebSocketManager
 {
@@ -18,7 +19,7 @@ namespace WebSocketManager
         {
             //services.AddSingleton<ILogBase>(new LogBase(new FileInfo($@"C:\temp\log.txt")));
             services.AddSingleton<SessionCollection>();
-            services.AddSingleton<HubService>();
+            services.AddSingleton<WebSocketRPCService<WebSocketsRPCProxy>>();
             services.AddSingleton<MainVM>();
             services.AddSingleton<MainWindow>();
         }

@@ -36,7 +36,7 @@ namespace WebSocketManager.Services
         protected override void OnOpen() 
         {
             base.OnOpen();
-            session = new SessionProxy() { ID = ID, Proxy = this, Statuses = new TestStatuses() };
+            session = new SessionProxy() { ID = ID, Proxy = this };
             sessions?.Add(session);
         }
 

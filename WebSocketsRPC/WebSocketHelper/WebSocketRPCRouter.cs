@@ -20,6 +20,7 @@ namespace WebSocketsRPC
                 {
                     var new_wsS = new WebSocketServer(port); //--> действует на все виды ip; new WebSocketServer("ws://<ip>:<port>"); --> как укажешь, так и будет
                     _wsServers.Add(port, new_wsS);
+                    new_wsS.Start();
                     return new_wsS;
                 }
             }
@@ -38,7 +39,6 @@ namespace WebSocketsRPC
                 }
                 var hub = server.AddWebSocketService<T>(hubPath);
                 var ws_route = new WebSocketRPCRoute(port, hubPath, hub.Sessions);
-                server.Start();
                 routes.Add(ws_route);
                 return ws_route;
             }

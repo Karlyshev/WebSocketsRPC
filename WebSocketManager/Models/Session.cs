@@ -6,8 +6,10 @@ using WebSocketsRPC;
 
 namespace WebSocketManager.Models 
 {
-    public class SessionProxy: MVVMPattern.NotifyPropertyChanged
+    public class SessionProxy : MVVMPattern.NotifyPropertyChanged
     {
+        public SessionProxy() => Statuses = new TestStatuses();
+
         public string ID { get; set; }
         public WebSocketsRPCProxy Proxy { get; set; }
         public TestStatuses Statuses { get; set; }
@@ -15,10 +17,7 @@ namespace WebSocketManager.Models
 		public bool send_to_all_client_except_IsExcepted { get; set; }
 		public bool send_to_clients_IsSelected { get; set; }
 
-        public void UpdateStatuses() 
-        {
-            OnPropertyChanged(nameof(Statuses));
-        }
+        public void UpdateStatuses() => OnPropertyChanged(nameof(Statuses));
 
         public void ResetStatuses() 
         {

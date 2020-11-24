@@ -12,7 +12,7 @@ namespace WebSocketManager.ViewModels
 {
     public class MainVM : NotifyPropertyChanged
     {
-        private HubService HubSrvc;
+        private WebSocketRPCService<WebSocketsRPCProxy> HubSrvc;
         private Visibility _startButtonVisible, _stopButtonVisible;
 
         public ObservableCollection<SessionProxy> Sessions { get; set; }
@@ -129,12 +129,13 @@ namespace WebSocketManager.ViewModels
                 }
                 Sessions[i].UpdateStatuses();
             }
-            HubSrvc.Send(type, sender, ids?.ToArray(), "Test", new object[] { type.ToString() });
+            HubSrvc.Send(type, sender?.Proxy, ids?.ToArray(), "Test", new object[] { type.ToString() });
         }
 
-        public MainVM(SessionCollection sessions, HubService hubService) 
+        public MainVM(SessionCollection sessions, WebSocketRPCService<WebSocketsRPCProxy> hubService) 
         {
             Sessions = sessions.Collection;
+            WebSocketsRPCProxy.SetSessionCollection(sessions);
             HubSrvc = hubService;
             StartButtonVisibility = Visibility.Visible;
         }
