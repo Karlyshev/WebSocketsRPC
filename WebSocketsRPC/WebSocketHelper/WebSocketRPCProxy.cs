@@ -3,13 +3,19 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using WebSocketSharp.Server;
 using WebSocketSharp;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Collections.Concurrent;
+using System.Linq;
+using System.Reflection;
 
 namespace WebSocketsRPC
 {
-    public class WebSocketRPCClient 
+    public class WebSocketRPCClient
     {
+        ConcurrentDictionary<string, WebSocketRPCInvocation> callbacks;
         #region Base
-        protected void InvokeMethod(string message)
+        protected object InvokeMethod(string message)
         {
             try
             {
@@ -38,10 +44,11 @@ namespace WebSocketsRPC
                             methodArgs[i] = methodParameters[i].HasDefaultValue ? methodParameters[i].DefaultValue : null;
                         }
                     }
-                method.Invoke(this, methodArgs);
+                return method.Invoke(this, methodArgs);
             }
             catch (Exception ex)
             {
+                return null;
             }
         }
         #endregion Base
@@ -49,6 +56,7 @@ namespace WebSocketsRPC
         private WebSocket _ws;
         public WebSocketRPCClient(string connection) 
         {
+            callbacks = new ConcurrentDictionary<string, WebSocketRPCInvocation>();
             _ws = new WebSocket(connection);
             _ws.OnMessage += (sender, e) =>
             {
@@ -70,6 +78,18 @@ namespace WebSocketsRPC
         }
 
         public void Invoke(string method, params object[] args) => _ws.Send(JsonConvert.SerializeObject(new WebSocketRPCPackage() { Target = method, Arguments = args ?? new object[0] }));
+        public async Task<object> InvokeAsync<TResult>(string method, params object[] args) => await Task.Run(() =>
+        {
+            var dateTime = DateTime.Now;
+            var waiter = new AutoResetEvent(false);
+            var id = $"{method}#{dateTime.Day}.{dateTime.Month}.{dateTime.Year}#{dateTime.Hour}:{dateTime.Minute}:{dateTime.Second}.{dateTime.Millisecond}";
+            _ws.Send(JsonConvert.SerializeObject(new WebSocketRPCPackage() { Target = method, Arguments = args ?? new object[0], IsInvocation = true, InvocationID = id }));
+            var invocationPackage = new WebSocketRPCInvocation() { InvocationID = id };
+            callbacks.TryAdd(id, invocationPackage);
+            waiter.WaitOne();
+            callbacks.TryRemove(id, out invocationPackage);
+            return invocationPackage.Result != null ? (TResult)invocationPackage.Result : new object();
+        });
     }
 
     public class WebSocketRPCProxy : WebSocketBehavior
@@ -83,18 +103,57 @@ namespace WebSocketsRPC
         protected override void OnOpen() => route = WebSocketRPCRouter.GetOrAddRoute<WebSocketRPCProxy>(Context.RequestUri.Port, Context.RequestUri.LocalPath);
 
         #region Base
-        protected void InvokeMethod(string message)
+        protected void InvocationEvent(bool isInvocation, string id, out bool isLocked, object result, string error) 
         {
+            isLocked = false;
+            if (isInvocation && id != null)
+            {
+                SendToCallerClient(id, new WebSocketRPCInvocation() { InvocationID = id, Error = error, Result = result });
+                isLocked = true;
+            }
+        }
+        
+        protected object InvokeMethod(string message)
+        {
+            bool isInvocation = false;
+            string invocationID = null;
+            bool isInvocationLocked = false;
             try
             {
                 JObject json = JObject.Parse(message);
+                isInvocation = json["IsInvocation"].ToObject<bool>();
+                invocationID = json["InvocationID"].ToString();
                 var methodName = json["Target"].ToString();
+                if (methodName == null || methodName.Length == 0) 
+                {
+                    InvocationEvent(isInvocation, invocationID, out isInvocationLocked, null, "NullReferenceException: methodName");
+                    throw new NullReferenceException("methodName");
+                }
                 JArray jsonArgs = (JArray)json["Arguments"];
+                MethodInfo foundMethod;
                 var type = GetType();
-                var method = type.GetMethod(methodName);
-                if (method == null)
+                if (json.ContainsKey("ParametersCount"))
+                {
+                    short parametersCount = json["ParametersCount"].ToObject<short>();
+                    foundMethod = type.GetMethods().Where(method => method.IsPublic && method.Name == methodName && method.GetParameters().Length == (parametersCount > 0 ? parametersCount : jsonArgs.Count)).SingleOrDefault();
+                }
+                else
+                {
+                    try
+                    {
+                        foundMethod = type.GetMethod(methodName);
+                    }
+                    catch
+                    {
+                        foundMethod = type.GetMethods().Where(method => method.IsPublic && method.Name == methodName && method.GetParameters().Length == jsonArgs.Count).SingleOrDefault();
+                    }
+                }
+                if (foundMethod == null)
+                {
+                    InvocationEvent(isInvocation, invocationID, out isInvocationLocked, null, "Exception: method wasn't found");
                     throw new NullReferenceException("method");
-                var methodParameters = method.GetParameters();
+                }
+                var methodParameters = foundMethod.GetParameters();
                 var methodArgs = new object[methodParameters.Length];
                 for (int i = 0; i < methodArgs.Length; i++)
                     try
@@ -112,10 +171,14 @@ namespace WebSocketsRPC
                             methodArgs[i] = methodParameters[i].HasDefaultValue ? methodParameters[i].DefaultValue : null;
                         }
                     }
-                method.Invoke(this, methodArgs);
+                var result = foundMethod.Invoke(this, methodArgs);
+                InvocationEvent(isInvocation, invocationID, out isInvocationLocked, result, null);
+                return result;
             }
             catch (Exception ex)
             {
+                InvocationEvent(isInvocation, invocationID, out isInvocationLocked, null, "CatchException: " + ex.Message);
+                return null;
             }
         }
         #endregion Base

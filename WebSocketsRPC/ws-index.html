@@ -15,9 +15,35 @@
         </script>
 	</head>
 	<body>
+        <button onclick="invoker()">Invoke</button>
         <div id="messages"></div>
 		<script type="text/javascript">
             'use strict';
+
+            function invoker() //тесты вызовов
+            {
+                wsClient.invoke("Test", "test").then(ok => { console.log("OK", ok) }, error => { console.log("error", error) });
+            }
+
+            class WebSocketRPCPackage
+            {
+                constructor(target, args)
+                {
+                    this.Target = target;
+                    this.Arguments = args;
+                    this.ParametersCount = -1;
+                    this.IsInvocation = false;
+                    this.InvocationID = null;
+                }
+
+                setInvocation() {
+                    this.IsInvocation = true;
+                    var dateTime = new Date();
+                    this.InvocationID = this.Target + "#" + dateTime.getDate() + "." + dateTime.getMonth() + "." + dateTime.getFullYear() + "#" + dateTime.getHours() + ":" +
+                                                            dateTime.getMinutes() + ":" + dateTime.getSeconds() + "." + dateTime.getMilliseconds();
+                }
+            }
+
             class WebSocketClient
             {
                 _url = "";
@@ -32,8 +58,6 @@
 
                 onOpen() { // вызывается при открытии соединения
                     this._invokeMethods('onOpen');
-                    //let query = { Target: "TER", Arguments: ["5", JSON.stringify({ a1: "aaa", a2: 5 }), 78.78] };
-                    //ws.send(JSON.stringify(query));
                 };
 
                 onError(e) { // вызывается в случае ошибки, например, при обрыве связи
@@ -58,8 +82,41 @@
                     if (arguments.length > 0)
                         for (let i = 1; i < arguments.length; i++)
                             args.push(arguments[i]);
-                    let message = { Target: method, Arguments: args };
+                    let message = new WebSocketRPCPackage(method, args);
                     this._ws.send(JSON.stringify(message));
+                }
+
+                send(method, parametersCount)
+                {
+                    let args = [];
+                    if (arguments.length > 0)
+                        for (let i = 2; i < arguments.length; i++)
+                            args.push(arguments[i]);
+                    let message = new WebSocketRPCPackage(method, args);
+                    message.ParametersCount = parametersCount;
+                    this._ws.send(JSON.stringify(message));
+                }
+
+                invoke(method)
+                {
+                    let args = [];
+                    if (arguments.length > 0)
+                        for (let i = 1; i < arguments.length; i++)
+                            args.push(arguments[i]);
+                    let message = new WebSocketRPCPackage(method, args);
+                    message.setInvocation();
+                    const p = new Promise((resolve, reject) => {
+                        this.on(message.InvocationID, (callbackMessage) => {
+                            this.off(callbackMessage.InvocationID);
+                            if (callbackMessage.Error != null)
+                                reject(callbackMessage.Error);
+                            else
+                                resolve(callbackMessage.Result);
+                        });
+
+                        this._ws.send(JSON.stringify(message));
+                    });
+                    return p;
                 }
 
                 on(name, func) {
@@ -97,7 +154,7 @@
                 };
             };
 
-            let wsClient = new WebSocketClient('ws://127.0.0.1:9000/Hub');
+            var wsClient = new WebSocketClient('ws://127.0.0.1:9000/Hub');
             wsClient.on('onMessage', function (msg) {
                 addMessage('New message: ' + msg.data);
             });
