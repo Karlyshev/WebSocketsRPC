@@ -42,6 +42,10 @@
         /// Filter "SPECIFIED CLIENTS". Send message to only clients specified in additionalData field
         /// </summary>
         #endregion Description
-        SpecifiedClients = 5
+        SpecifiedClients = 5,
+        /// <summary>
+        /// Additonal config above filter "SPECIFIED CLIENT". Used for sending message as Invocation
+        /// </summary>
+        InvocationEvent = 255
     }
 }

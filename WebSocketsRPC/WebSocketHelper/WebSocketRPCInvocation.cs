@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace WebSocketsRPC 
 {
@@ -8,5 +9,8 @@ namespace WebSocketsRPC
         public object Result { get; set; }
 
         public string Error { get; set; }   
+
+        public AutoResetEvent waiter { get; set; }
+        public Type ResultType { get; set; }
     }
 }

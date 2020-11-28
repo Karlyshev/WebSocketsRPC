@@ -33,6 +33,8 @@ namespace WebSocketManager.Services
             session.UpdateStatuses();
         }
 
+        public string TestInvoke(string t) => "testMessage";
+
         protected override void OnOpen() 
         {
             base.OnOpen();

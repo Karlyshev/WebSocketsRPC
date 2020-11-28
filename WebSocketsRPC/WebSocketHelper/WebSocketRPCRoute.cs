@@ -29,7 +29,17 @@ namespace WebSocketsRPC
         {
             if (_sessions == null)
                 return;
-            string message = JsonConvert.SerializeObject(new WebSocketRPCPackage() { Target = method, Arguments = args ?? new object[0] });
+            string message = JsonConvert.SerializeObject(new WebSocketRPCPackage()
+            {
+                Target = method,
+                Arguments = args ?? new object[0],
+                IsInvocation = type == SendToConfigurationType.InvocationEvent,
+                InvocationID = type == SendToConfigurationType.InvocationEvent ? method : null
+            });
+            if (type == SendToConfigurationType.InvocationEvent)
+            {
+                type = SendToConfigurationType.SpecifiedClient;
+            }
             if (type == SendToConfigurationType.All)
             {
                 var sessions = _sessions.Sessions.ToList();
@@ -68,6 +78,8 @@ namespace WebSocketsRPC
         public void SendToClient(string connectionId, string method, params object[] args) => SendToClients(SendToConfigurationType.SpecifiedClient, new string[] { connectionId }, method, args);
 
         public void SendToClients(string[] clientIds, string method, params object[] args) => SendToClients(SendToConfigurationType.SpecifiedClients, clientIds, method, args);
+
+        public void InvocationEventReceive(string connectionId, WebSocketRPCInvocation package) => SendToClients(SendToConfigurationType.InvocationEvent, new string[] { connectionId }, package.InvocationID, new object[] { package.Result, package.Error });
         #endregion Extensions
     }
 }

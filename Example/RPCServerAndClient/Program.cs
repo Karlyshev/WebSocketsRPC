@@ -2,6 +2,13 @@
 
 namespace Example
 {
+    public class TestClass 
+    {
+        public string arg1 { get; set; }
+        public bool arg2 { get; set; }
+        public int arg3 { get; set; }
+    }
+
     //proxy from clients, I used WebSocketRPC/ws-index.html for tests
     //simple: it's listener on server
     class MyWebSocketService: WebSocketsRPC.WebSocketRPCProxy
@@ -20,6 +27,11 @@ namespace Example
             Console.WriteLine($"server -> client: method = Test, args = {w}");
             Invoke("Test", w); 
         }
+
+        public TestClass ComplexText() 
+        {
+            return new TestClass { arg1 = "test", arg2 = true, arg3 = 0123456789 };
+        }
     }
 
     class Program
@@ -36,6 +48,9 @@ namespace Example
             Console.WriteLine("Press any key for sending Test message to clients...");
             Console.ReadLine();
             service.Send(WebSocketsRPC.SendToConfigurationType.All, null, null, "Test", new object[] { "ping" }); //server -> clients
+            //var result = client.InvokeAsync<bool>("TestB", "1234").GetAwaiter().GetResult();
+            //var resultO = client.InvokeAsync<object>("TestO").GetAwaiter().GetResult();
+            var resultC = client.InvokeAsync<TestClass>("ComplexText").GetAwaiter().GetResult(); //client -> server -> client (client <=> server)
             Console.WriteLine("Press any key for stopping the server...");
             Console.ReadLine();
             service.Stop();
